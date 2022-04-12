@@ -1,0 +1,82 @@
+import pandas as pd
+from numpy import array,NaN, zeros_like
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
+from itertools import combinations, chain
+import pandas as pd
+
+
+
+
+
+
+
+dataset = "Use_Data.csv"
+
+df = pd.read_csv(dataset)
+
+
+
+
+variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore"
+
+   
+    ]
+
+
+
+df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
+
+
+print(df_updated)
+
+
+
+
+
+
+
+epsilon = 1
+
+X =df_updated
+X = StandardScaler().fit_transform(X)
+
+
+db = DBSCAN(eps= epsilon, min_samples=2,).fit(X)
+core_samples_mask = zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
+labels_pred = db.labels_
+n_clusters_ = len(set(labels_pred)) - (1 if -1 in labels_pred else 0)
+n_noise_ = list(labels_pred).count(-1)
+
+
+
+
+
+
+print("Estimated number of clusters: %d" % n_clusters_)
+print("Estimated number of noise points: %d" % n_noise_)
+
+
+
+
+
+import matplotlib.pyplot as plt
+
+
+
+
+
+ax = plt.axes(projection="3d")
+
+ax.scatter3D(df_updated["Age"], df_updated["AnnualIncome"], df_updated["AnnualIncome"], marker = ".", c= labels_pred)
+
+
+
+
+
+
+plt.title(f"Total Number of Clusters :{n_clusters_}")
+
+plt.show()
