@@ -1,10 +1,7 @@
 import pandas as pd
-from numpy import array,NaN, zeros_like
+from numpy import zeros_like
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
-from itertools import combinations, chain
-import pandas as pd
 
 
 
@@ -19,17 +16,14 @@ df = pd.read_csv(dataset)
 
 
 
-variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore"
-
-   
-    ]
+variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
 
 
 
 df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
 
 
-print(df_updated)
+# print(df_updated)
 
 
 
@@ -38,12 +32,13 @@ print(df_updated)
 
 
 epsilon = 1
+min_clusters = 3
 
 X =df_updated
 X = StandardScaler().fit_transform(X)
 
 
-db = DBSCAN(eps= epsilon, min_samples=2,).fit(X)
+db = DBSCAN(eps= epsilon, min_samples= min_clusters,).fit(X)
 core_samples_mask = zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels_pred = db.labels_
@@ -79,4 +74,4 @@ ax.scatter3D(df_updated["Age"], df_updated["AnnualIncome"], df_updated["AnnualIn
 
 plt.title(f"Total Number of Clusters :{n_clusters_}")
 
-plt.show()
+# plt.show()
