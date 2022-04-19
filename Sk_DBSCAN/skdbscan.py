@@ -9,18 +9,18 @@ from sklearn.preprocessing import StandardScaler
 
 
 
-dataset = "Use_Data.csv"
+dataset = "User_Data.csv"
 
 df = pd.read_csv(dataset)
 
 
 
 
-variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
+# variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
 
 
 
-df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
+# df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
 
 
 # print(df_updated)
@@ -34,7 +34,7 @@ df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
 epsilon = 1
 min_clusters = 3
 
-X =df_updated
+X =df
 X = StandardScaler().fit_transform(X)
 
 

@@ -2,7 +2,7 @@
 
 
 import pandas as pd
-from numpy import zeros_like
+from numpy import count_nonzero, zeros_like
 from sklearn import cluster
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
@@ -10,32 +10,63 @@ import numpy as np
 import math
 
 
-dataset = "Use_Data.csv"
-
-old_df = pd.read_csv(dataset)
 
 
+"""
 
-variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
-
-
-
-df = old_df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
+# remove male female from dataset
 
 
-array_df = np.array(df)
+Looking to fix dbscan 
 
-dict_df = {}
+get new datasets
 
-for i in array_df: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
-    dict_df[i[0]] = i[1:]
+
+
+name = main
+
+
+
+
+"""
+
+
+
+file_path = "User_Data.csv"
+
+
+
+dataset = np.array(pd.read_csv(file_path))
+
+
+# dataset = "Use_Data.csv"
+
+# old_df = pd.read_csv(dataset)
+
+
+# variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
+
+# df = old_df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
+
+
+# array_df = np.array(df)
+
+dict_ds = {}
+count = 1
+
+for i in dataset: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
+    dict_ds[count] =  i
+    count+=1
+
+
 
 # for i in dict_df:
 #     print (i, dict_df[i])
 
 
-for i in dict_df:
-    print(i, dict_df[i])
+
+for i in dict_ds:
+    print(i, dict_ds[i])
 
 
 
@@ -153,11 +184,11 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-epsilon = 1
+epsilon = 10
 min_clusters = 3
 
     
-print("Number of Clusters:",dbscan(dict_df,epsilon,min_clusters))
+print("Number of Clusters:",dbscan(dict_ds,epsilon,min_clusters))
 
 
 
