@@ -59,14 +59,8 @@ for i in dataset: #makes dictionary { CustomerID : [numpy array of variables to 
     count+=1
 
 
-
-# for i in dict_df:
-#     print (i, dict_df[i])
-
-
-
-for i in dict_ds:
-    print(i, dict_ds[i])
+# for i in dict_ds:
+#     print(i, dict_ds[i])
 
 
 
@@ -218,8 +212,9 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-min_clusters = 3
-epsilon = findEpsilon(dict_ds,min_clusters)
+min_clusters = 1
+# epsilon = findEpsilon(dict_ds,min_clusters)
+epsilon = .1
     
 print("Number of Clusters:",dbscan(dict_ds,epsilon,min_clusters))
 

@@ -15,24 +15,8 @@ df = pd.read_csv(dataset)
 
 
 
-
-# variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
-
-
-
-# df_updated = df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
-
-
-# print(df_updated)
-
-
-
-
-
-
-
-epsilon = 1
-min_clusters = 3
+epsilon = .5
+min_clusters = 5
 
 X =df
 X = StandardScaler().fit_transform(X)
@@ -49,7 +33,7 @@ n_noise_ = list(labels_pred).count(-1)
 
 
 
-
+print(db.labels_)
 print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 
@@ -65,7 +49,7 @@ import matplotlib.pyplot as plt
 
 ax = plt.axes(projection="3d")
 
-ax.scatter3D(df_updated["Age"], df_updated["AnnualIncome"], df_updated["AnnualIncome"], marker = ".", c= labels_pred)
+ax.scatter3D(df["Age"], df["AnnualIncome"], df["AnnualIncome"], marker = ".", c= labels_pred)
 
 
 
@@ -74,4 +58,4 @@ ax.scatter3D(df_updated["Age"], df_updated["AnnualIncome"], df_updated["AnnualIn
 
 plt.title(f"Total Number of Clusters :{n_clusters_}")
 
-# plt.show()
+plt.show()
