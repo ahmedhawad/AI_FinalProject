@@ -127,6 +127,40 @@ def noise(dataset,clusters):
         
 
 
+def findEpsilon(dataset, minPts):
+    kNearestDist = []
+    #List of Lists, whose index corresponds to the point in the dataset. ie: index 2 is the list of distances from all points to point 2
+    distances = []
+
+    for p1 in dataset.values:
+        distP1 = []
+        for p2 in dataset.values:
+            distP1.append(euclidean_distance(p1, p2))
+        distances.append(distP1)
+
+    for i in range(len(distances)):
+        sortedDist = sorted(distances[i])
+        kNearestDist.append(list(sortedDist)[minPts])
+    kNearestDist.sort()
+    plt.plot(kNearestDist)
+    plt.show()
+
+    maxCurve = []
+    for i in range(1, len(kNearestDist)-1):
+        secDerivative = kNearestDist[i+1] + kNearestDist[i-1] - 2 * kNearestDist[i]
+        maxCurve.append(secDerivative)
+    maxValue = max(maxCurve)
+    maxIndex = maxCurve.index(maxValue) + 1
+    epsilon = kNearestDist[maxIndex]
+
+    kn = KneeLocator(range(0, 200), kNearestDist, curve='convex', direction='increasing', interp_method='interp1d')
+    epsilon2 = kNearestDist[kn.knee]
+
+    print(epsilon)
+    print(epsilon2)
+
+    return epsilon
+
 
 
 def dbscan(dataset,epsilon, min_points):
@@ -184,9 +218,8 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-epsilon = 10
 min_clusters = 3
-
+epsilon = findEpsilon(dict_ds,min_clusters)
     
 print("Number of Clusters:",dbscan(dict_ds,epsilon,min_clusters))
 
