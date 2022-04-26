@@ -10,6 +10,7 @@ filepath = "User_Data.csv"
 def dist(X,Y):
 	#euclidean distance
 	return np.sqrt(sum([(x-y)*(x-y) for x,y in zip(X,Y)]))
+
 class custom_DBSCAN():
 	def __init__(self, eps=1, minSamples=10):
 		self.eps = eps
@@ -70,7 +71,7 @@ class custom_DBSCAN():
 
 
 eps = 0.3
-minsamples = 1
+minsamples = 2
 
 df=pd.read_csv(filepath)
 # df['Gender']=df['Gender'].map({'Male':0,'Female':1})
@@ -78,12 +79,15 @@ df=pd.read_csv(filepath)
 scaler = StandardScaler()
 X=df.to_numpy()
 X=scaler.fit_transform(X)
-clf= custom_DBSCAN(eps = eps, minSamples = min )
+clf= custom_DBSCAN(eps = eps, minSamples = minsamples )
 ans=clf.predict(X)
 clustering = sklearn_DBSCAN(eps = eps, min_samples=minsamples).fit(X)
 print(ans)
 
 print(clustering.labels_)
+
+
+
 
 from sklearn.metrics.cluster import homogeneity_score
 from sklearn.metrics.cluster import rand_score
