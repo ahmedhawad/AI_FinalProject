@@ -6,30 +6,19 @@ from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import math
-dataset = "User_Data.csv"
-df = pd.read_csv(dataset)
-# old_df.info()
-# variables = ["CustomerID","Gender","Age","Annual Income (k$)","Spending Score (1-100)" ]
-# df = old_df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
-array_df = np.array(df)
-# array_norm = np.linalg.norm(array_df) # dont normalize customerID (axis = 0)
-# array_norm_df = array_df/array_norm
-# print(array_norm_df)
-dict_df = {}
-for i in array_df: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
-    dict_df[i[0]] = i[1:]
-# for i in dict_df:
-#     print (i, dict_df[i])
-for i in dict_df:
-    print(i, dict_df[i])
-dict_norm_df = {}
-# for i in array_norm_df: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
-#     dict_norm_df[i[0]] = i[1:]
-# for i in dict_df:
-#     print (i, dict_df[i])
-# factor=1.0/sum(dict_df.itervalues())
-# for k in dict_df:
-#   dict_norm_df[k] = dict_df[k]*factor
+
+file_path = "User_Data.csv"
+
+dataset = np.array(pd.read_csv(file_path))
+
+dict_ds = {}
+count = 1
+
+for i in dataset: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
+    dict_ds[count] =  i
+    count+=1
+
+
 """
 loops through everyone and if there is someone matchign the minimum distance combines them in
 """
@@ -42,6 +31,7 @@ def euclidean_distance(point1, point2):
     for x1,x2 in zip(point1, point2):
         sums+= ((x1-x2)**2)
     return math.sqrt(sums)
+
 def cluster_check(clusters, point):
     """
     True if point is in the list
@@ -51,6 +41,7 @@ def cluster_check(clusters, point):
         if point in thelist:
             return True
     return False
+
 def noise(dataset,clusters):
     """
     not working yet
@@ -70,6 +61,7 @@ def noise(dataset,clusters):
         for j in dataset[i]:
             if j not in unpacked_clusters:
                 noise.append(j)
+
 def dbscan(dataset,epsilon, min_points):
     """
     
@@ -109,7 +101,7 @@ def dbscan_new(dataset, epsilon, min_points, cluster_list):
     not working yet
     """
     
-    if (len(dataset) >= min_points):
+    if (len(dataset) >= min_points): #checks if min points of sufficient for the entire dataset
         clusters = []
         for i in dataset: #main point
             i_list = []
@@ -134,10 +126,10 @@ def dbscan_new(dataset, epsilon, min_points, cluster_list):
                 # clusters.append(i_list)
                 for k in i_list:
                   clusters.append(k)
-        print(len(clusters))
+        # print(len(clusters))
         cluster_duplicate_free = [] 
         [cluster_duplicate_free.append(x) for x in clusters if x not in cluster_duplicate_free] 
-        print(len(cluster_duplicate_free))
+        # print(len(cluster_duplicate_free))
         cluster_list.append(cluster_duplicate_free)
         dataset_update = dataset.copy() # dictionary has a weird copy method
         
@@ -152,8 +144,8 @@ def dbscan_new(dataset, epsilon, min_points, cluster_list):
           if not card:
             del dataset_update[x]
         # print(len(dataset_update))
-        print(len(dataset_update))
-        print("loop", cluster_list, len(cluster_list))
+        # print(len(dataset_update))
+        # print("loop", cluster_list, len(cluster_list))
         dbscan_new(dataset_update, epsilon, min_points, cluster_list)
     else:
         return cluster_list, len(dataset)
@@ -176,10 +168,7 @@ cluster_2 = []
 # [[first cluster]]
 epsilon = 10
 min_clusters = 3
-print(len(dict_df))
+# print(len(dict_df))
 # print("Number of Clusters:",dbscan_new(dict_df,epsilon,min_clusters, cluster_2))
 dbscan_new(dict_df,epsilon,min_clusters, cluster_2)
-print(type(dict_df[1]))
-from numpy import zeros_like
-from sklearn.cluster import DBSCAN
-from sklearn.preprocessing import StandardScaler
+# print(type(dict_df[1]))

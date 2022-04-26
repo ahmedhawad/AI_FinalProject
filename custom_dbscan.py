@@ -8,9 +8,8 @@ from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import math
-
-
-
+import matplotlib.pyplot as plt
+from kneed import KneeLocator
 
 """
 
@@ -126,10 +125,11 @@ def findEpsilon(dataset, minPts):
     #List of Lists, whose index corresponds to the point in the dataset. ie: index 2 is the list of distances from all points to point 2
     distances = []
 
-    for p1 in dataset.values:
+    # print(dataset)
+    for p1 in dataset:
         distP1 = []
-        for p2 in dataset.values:
-            distP1.append(euclidean_distance(p1, p2))
+        for p2 in dataset:
+            distP1.append(euclidean_distance(dataset[p1], dataset[p2]))
         distances.append(distP1)
 
     for i in range(len(distances)):
@@ -153,7 +153,7 @@ def findEpsilon(dataset, minPts):
     print(epsilon)
     print(epsilon2)
 
-    return epsilon
+    return epsilon2
 
 
 
@@ -212,9 +212,9 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-min_clusters = 1
-# epsilon = findEpsilon(dict_ds,min_clusters)
-epsilon = .1
+min_clusters = 10
+epsilon = findEpsilon(dict_ds,min_clusters)
+# epsilon = .1
     
 print("Number of Clusters:",dbscan(dict_ds,epsilon,min_clusters))
 

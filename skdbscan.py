@@ -15,10 +15,10 @@ df = pd.read_csv(dataset)
 
 
 
-epsilon = .5
-min_clusters = 5
+epsilon = .3
+min_clusters = 4
 
-X =df
+X = df.values
 X = StandardScaler().fit_transform(X)
 
 
