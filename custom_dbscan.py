@@ -7,6 +7,7 @@ from sklearn import cluster
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 import numpy as np
+from sklearn.datasets import make_moons
 import math
 import matplotlib.pyplot as plt
 from kneed import KneeLocator
@@ -36,16 +37,17 @@ file_path = "User_Data.csv"
 
 
 dataset = np.array(pd.read_csv(file_path))
+dataset, not_used =  make_moons(
+    n_samples=750, noise=0.03
+)
 
 
 # dataset = "Use_Data.csv"
 
-# old_df = pd.read_csv(dataset)
 
 
-# variables = ["CustomerID","Gender","Age","AnnualIncome","SpendingScore" ]
 
-# df = old_df[variables].replace({"Male": 1, "Female": 0,}).astype(int)
+
 
 
 # array_df = np.array(df)
@@ -162,8 +164,6 @@ def dbscan(dataset,epsilon, min_points):
     
     dataset is dict {key: [np array of variables used for dataset]}
 
-
-    not working yet
     """
 
 
@@ -199,7 +199,7 @@ def dbscan(dataset,epsilon, min_points):
         if len(i_list) >= min_points:  #if it meets min points criteria
                 clusters.append(i_list)
 
-    return len(clusters), noise(dataset,clusters)
+    return len(clusters), noise(dataset,clusters), clusters
 
 
             # if not i_list: #if the list is not empty
@@ -212,23 +212,16 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-min_clusters = 10
-epsilon = findEpsilon(dict_ds,min_clusters)
-# epsilon = .1
+min_clusters = 2
+# epsilon = findEpsilon(dict_ds,min_clusters)
+epsilon = .1
+
+output = dbscan(dict_ds,epsilon,min_clusters)
     
-print("Number of Clusters:",dbscan(dict_ds,epsilon,min_clusters))
+print("Number of Clusters:")
 
 
 
-
-
-
-d = {
-    "a": [1,2,4],
-    "b": [1,2,4],
-    "c": [1,2,4]
-
-    }
 
 
 

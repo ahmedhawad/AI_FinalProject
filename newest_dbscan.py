@@ -70,8 +70,8 @@ class custom_DBSCAN():
 
 
 
-eps = 0.3
-minsamples = 2
+eps = .2
+minsamples = 3
 
 df=pd.read_csv(filepath)
 # df['Gender']=df['Gender'].map({'Male':0,'Female':1})
@@ -79,12 +79,13 @@ df=pd.read_csv(filepath)
 scaler = StandardScaler()
 X=df.to_numpy()
 X=scaler.fit_transform(X)
-clf= custom_DBSCAN(eps = eps, minSamples = minsamples )
-ans=clf.predict(X)
-clustering = sklearn_DBSCAN(eps = eps, min_samples=minsamples).fit(X)
-print(ans)
 
-print(clustering.labels_)
+clf= custom_DBSCAN(eps = eps, minSamples = minsamples )
+ans=clf.predict(np.array(pd.read_csv(filepath)))
+clustering = sklearn_DBSCAN(eps = eps, min_samples=minsamples).fit(X)
+# print(ans)
+
+# print(clustering.labels_)
 
 
 
@@ -92,7 +93,7 @@ print(clustering.labels_)
 from sklearn.metrics.cluster import homogeneity_score
 from sklearn.metrics.cluster import rand_score
 from sklearn.metrics.cluster import completeness_score
-print("Number of Clusters:",len(set(clustering.labels_),))
-print("homogeneity score:  ", homogeneity_score(clustering.labels_,ans))
-print("rand score:         ", rand_score(clustering.labels_,ans))
-print("completeness score: ", completeness_score(clustering.labels_,ans))
+print("Number of Clusters:",len(set(clustering.labels_)) , len(set(ans))        )
+# print("homogeneity score:  ", homogeneity_score(clustering.labels_,ans))
+# print("rand score:         ", rand_score(clustering.labels_,ans))
+# print("completeness score: ", completeness_score(clustering.labels_,ans))
