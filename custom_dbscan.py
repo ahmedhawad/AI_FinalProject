@@ -26,29 +26,54 @@ get new datasets
 name = main
 
 
-
-
 """
 
 
 
-file_path = "User_Data.csv"
+
+# file_path = "User_Data.csv"
 
 
 
-dataset = np.array(pd.read_csv(file_path))
+# dataset = np.array(pd.read_csv(file_path))
 dataset, not_used =  make_moons(
-    n_samples=750, noise=0.03
+    n_samples= 700, noise=0.08
 )
 
 
+# print(dataset)
+# print(not_used)
+
 # dataset = "Use_Data.csv"
 
+# for i in not_used:
+#     print(i)
 
 
 
 
+# print(len(not_used))
 
+
+new = []
+for i in range(10):
+
+    new.append(1)
+
+# print(len(new))
+x = dataset
+
+count = 0
+
+# for i in x:
+#     if i[0]>1:
+#         x[i] == [1]
+#     else:
+#         x[i] == [0]
+        
+        
+
+labeling = list([1]*len(dataset))
 
 # array_df = np.array(df)
 
@@ -60,8 +85,15 @@ for i in dataset: #makes dictionary { CustomerID : [numpy array of variables to 
     count+=1
 
 
+# print(len(dataset))
+# print(dataset)
+
 # for i in dict_ds:
 #     print(i, dict_ds[i])
+
+cluster_label = np.shape(len(dict_ds[1]))
+
+# print(cluster_label)
 
 
 
@@ -81,16 +113,18 @@ def euclidean_distance( point1, point2):
     for x1,x2 in zip(point1, point2):
         sums+= ((x1-x2)**2)
 
-
     return math.sqrt(sums)
 
 
 
-def cluster_check(clusters, point):
+def already_clustered(clusters, point):
 
     """
     True if point is in the list
     False if the point is not in the list
+
+
+    [ [1,2,4] ]
     """
 
     for thelist in clusters:
@@ -170,36 +204,44 @@ def dbscan(dataset,epsilon, min_points):
     clusters  = [] #list of lists of all the clusters
 
 
+
     for i in dataset: #main point
         i_list = []
 
+
         for j in dataset: #secondary point
-
-            if i != j:
-
-
+            # if i != j:
                 distance = euclidean_distance(dataset[i],dataset[j])#distance  between the two
-                #problem is that the our scale is diff than sklearn. I think they normalize their data, we don'y
-                within_bounds = distance <= epsilon #boolean
+                within_bounds = distance >= epsilon #boolean
 
+                if within_bounds: #if it meets epsilon criteria  
 
-                # print(distance,within_bounds)
-                if not within_bounds: #if it meets epsilon criteria  
-
-                    if not cluster_check(clusters, j): #it is already not part of a group
-                         
-                        #no need to check if it's in i_list because it can only ever be added there once
-                        
-                        i_list.append(j)
-
-        """
-        Add a method to get noise points
-        """
-
+                    if not already_clustered(clusters, j):
+                        i_list.append(j) #it is already not part of a group   
+                        print(i_list)               
         if len(i_list) >= min_points:  #if it meets min points criteria
                 clusters.append(i_list)
 
-    return len(clusters), noise(dataset,clusters), clusters
+    label = [-1]*(len(dataset))
+    # print(len(label))    
+    
+    count = 0
+    for i in clusters:
+
+        for j in i: 
+
+            label[j-1] = count
+
+    
+        count +=1
+
+
+
+
+
+    return len(clusters), noise(dataset,clusters), clusters,label
+
+# print(3)
 
 
             # if not i_list: #if the list is not empty
@@ -212,13 +254,27 @@ def dbscan(dataset,epsilon, min_points):
     
 
 
-min_clusters = 2
-# epsilon = findEpsilon(dict_ds,min_clusters)
-epsilon = .1
+min_clusters = 10 # epsilon = findEpsilon(dict_ds,min_clusters)
+epsilon = .5
 
 output = dbscan(dict_ds,epsilon,min_clusters)
+
+new = output[3]
     
-print("Number of Clusters:")
+print("Number of Clusters:", output[0], )
+# print(output[3])
+
+# print(dataset[:,0],output[2])
+
+# for i in output[2]:
+#     print(i)
+
+plt.scatter(x= dataset[:,0], y= dataset[:,1], c = new)
+
+plt.show()
+
+
+
 
 
 

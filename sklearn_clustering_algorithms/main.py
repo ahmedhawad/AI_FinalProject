@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 import pandas as pd
 from data import df
 from DBSCAN import dbscan
+
 x, labels_true = make_moons(n_samples=1000, noise=0.08)
 
 

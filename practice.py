@@ -36,10 +36,10 @@ from sklearn.preprocessing import StandardScaler
 # #############################################################################
 # Generate sample data
 X, labels_true = make_moons(
-    n_samples=750, noise=0.03
+    n_samples=750, noise=0.09
 )
 
-# X = StandardScaler().fit_transform(X)
+X = StandardScaler().fit_transform(X)
 
 # #############################################################################
 # Compute DBSCAN
@@ -101,3 +101,5 @@ for k, col in zip(unique_labels, colors):
 
 plt.title("Estimated number of clusters: %d" % n_clusters_)
 plt.show()
+
+print(labels_true)
