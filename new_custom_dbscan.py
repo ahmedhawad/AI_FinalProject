@@ -93,6 +93,8 @@ def dbscan(dataset,epsilon, min_points):
         """
         if len(i_list) >= min_points:  #if it meets min points criteria
                 clusters.append(i_list)
+
+
     return len(clusters), noise(dataset,clusters), clusters
 def dbscan_new(dataset, epsilon, min_points, cluster_list):
     """

@@ -135,7 +135,6 @@ def already_clustered(clusters, point):
 
 def noise(dataset,clusters):
     """
-    not working yet
     """
 
     noise = []
@@ -223,16 +222,10 @@ def dbscan(dataset,epsilon, min_points):
                 clusters.append(i_list)
 
     label = [-1]*(len(dataset))
-    # print(len(label))    
-    
     count = 0
     for i in clusters:
-
         for j in i: 
-
             label[j-1] = count
-
-    
         count +=1
 
 
