@@ -1,8 +1,7 @@
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import RobustScaler
-from sklearn.cluster import DBSCAN as  DBSCAN2
+from sklearn.cluster import DBSCAN as  skDBSCAN
 from sklearn.datasets import make_moons, make_circles
 from sklearn.metrics.cluster import homogeneity_score
 from sklearn.metrics.cluster import rand_score
@@ -82,66 +81,134 @@ class DBSCAN():
 
 
 
-# df=pd.read_csv('Use_Data.csv')
-# df['Gender']=df['Gender'].map({'Male':1,'Female':0})
-# df=df.drop(['CustomerID'],axis=1)
-# scaler =RobustScaler()
-# X=df.to_numpy()
-
-#X=scaler.fit_transform(X)
-# clf=DBSCAN(0.5,1)
-# ans=clf.predict(scaler.fit_transform(X))
-# clustering = DBSCAN2(eps=0.5, min_samples=1).fit(scaler.fit_transform(X))
+####################################    DBSCANS     #################################### 
 
 
-
-# F="vhHdDx.s+*"
-# C="bgrcmykww"
-# cl=[]  
-# plt.rcParams["figure.figsize"] = (5,5)
-# color and shape of the chart
-
-
-# for f in F:
-#         for c in C:
-#                 cl.append(c+f)
-# print(cl)
-# plt.grid()
-
-
-
-
-
-
-
-X,y = make_moons(n_samples=1000, shuffle=False, noise=0.07)
-
-#########
-epsilon = 0.159
+##    Constansts     ##
+epsilon = 0.2
 min_points = 3
 
-#########
-custom_dbscan=DBSCAN(epsilon,min_points).predict(X)
-sk_dbscan = DBSCAN2(eps=epsilon, min_samples=min_points).fit(X)
+#########    Make Moons DBSCAN     ######### 
+X_moons,y = make_moons(n_samples = 500, shuffle=False, noise=0.07)
+custom_dbscan_moons=DBSCAN(epsilon,min_points).predict(X_moons)
+sk_dbscan_moons = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_moons)
 
-print(X)
+#########    Make Circles DBSCAN     ######### 
+X_circles,y = make_circles(n_samples = 500, shuffle=False, noise=0.02, factor = 0.5)
+custom_dbscan_circles=DBSCAN(epsilon,min_points).predict(X_circles)
+sk_dbscan_circles = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_circles)
+
+#########    User Data DBSCAN     ######### 
+epsilon = 15
+min_points = 8
+filepath = "User_Data.csv"
+X_user_data = np.array(pd.read_csv(filepath))
+custom_dbscan_user_data=DBSCAN(epsilon,min_points).predict(X_user_data)
+sk_dbscan_user_data = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_user_data)
 
 
 
-plt.figure(figsize = (10, 5))
-plt.subplot(121)
-plt.scatter(x= X[:,0], y= X[:,1], c = custom_dbscan)
-plt.title('Our own DBSCAN result')
-plt.subplot(122)
-plt.title('Sklearn DBSCAN result')
-plt.scatter(x= X[:,0], y= X[:,1], c = sk_dbscan.labels_)
+
+
+####################################    Graphing     #################################### 
+
+plt.figure(figsize = [8, 12], dpi =80)
+
+# Graphing Moons #
+plt.subplot(321)
+plt.scatter(x= X_moons[:,0], y= X_moons[:,1], c = custom_dbscan_moons)
+plt.title('Custom DBSCAN Moon')
+plt.subplot(322)
+plt.title('Sklearn DBSCAN Moon')
+plt.scatter(x= X_moons[:,0], y= X_moons[:,1], c = sk_dbscan_moons.labels_)
+
+# Graphing Circles #
+plt.subplot(323)
+plt.scatter(x= X_circles[:,0], y= X_circles[:,1], c = custom_dbscan_circles)
+plt.title('Custom DBSCAN Circles')
+plt.subplot(324)
+plt.title('Sklearn DBSCAN Circles')
+plt.scatter(x= X_circles[:,0], y= X_circles[:,1], c = sk_dbscan_circles.labels_)
+
+# Graphing User Data #
+plt.subplot(325)
+plt.scatter(X_user_data[:,0], X_user_data[:,1],X_user_data[:,2],  c = custom_dbscan_user_data)
+plt.title('Custom DBSCAN User Data')
+plt.subplot(326)
+plt.title('Sklearn DBSCAN User Data')
+plt.scatter(X_user_data[:,0], X_user_data[:,1],X_user_data[:,2], c = sk_dbscan_user_data.labels_)
+
+####################################    Printing Accuracy     #################################### 
+
+
+print("moons dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("rand score:         ", rand_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("completeness score: ", completeness_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("\n")
+
+print("circles dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("rand score:         ", rand_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("completeness score: ", completeness_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("\n")
+
+print("userdata dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
+print("rand score:         ", rand_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
+print("completeness score: ", completeness_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
+
+
 plt.show()
 
 
 
-print('Using our own DBSCAN: ', custom_dbscan)
-print('Sklearn DBSCAN: ', sk_dbscan.labels_)
 
-print("homogeneity score:  ", homogeneity_score(sk_dbscan.labels_,custom_dbscan))
-print("rand score:         ", rand_score(sk_dbscan.labels_,custom_dbscan))
-print("completeness score: ", completeness_score(sk_dbscan.labels_,custom_dbscan))
+####################################    Adding your own Dataset     #################################### 
+
+
+def dbscan_my_dataset():
+
+	print("Do you want to show dbscan your own dataset. yes or no? ")
+
+	x = input("My answer: ")
+	
+	if x == "yes":
+		
+
+		print("We will ask for your filepath, please ensure all columns are numbers")
+		filepath = input("filepath: ")
+
+		epsilon = int(input("epsilon: "))
+		min_points = int(input("minimum # of points for a cluster: "))
+		print("we will graph you dataset in a 2d graph, for higher dimensions please edit the code in the graphing")
+
+		### Performing DBSCAN (no need to edit) ###
+		X_input = np.array(pd.read_csv(filepath))
+		custom_dbscan_input = DBSCAN(epsilon,min_points).predict(X_user_data)
+		sk_dbscan_input = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_user_data)
+
+
+		### Graphing DBSCANs (no need to edit if your graph is 2d) ###
+
+		#to graph, you must edit the number of dimensions you want to see, we have by default a 2d graph
+		plt.subplot(121)
+		plt.scatter(X_input[:,0], X_input[:,1], c = custom_dbscan_input)
+		plt.title('Custom DBSCAN Input')
+		plt.subplot(122)
+		plt.title('Sklearn DBSCAN Input')
+		plt.scatter(X_input[:,0], X_input[:,1], c = sk_dbscan_input.labels_)
+
+
+		### Printing closeness custom DBSCAN to sklearn DBSCAN (no need to edit if your graph is 2d) ###
+
+		print("input dataset")
+		print("homogeneity score:  ", homogeneity_score(sk_dbscan_input.labels_,custom_dbscan_input))
+		print("rand score:         ", rand_score(sk_dbscan_input.labels_,custom_dbscan_input))
+		print("completeness score: ", completeness_score(sk_dbscan_input.labels_,custom_dbscan_input))
+
+
+		#showing graph
+		plt.show()
+
+dbscan_my_dataset()
