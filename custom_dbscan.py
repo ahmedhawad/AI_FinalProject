@@ -1,286 +1,215 @@
-
-
-
-import pandas as pd
-from numpy import count_nonzero, zeros_like
-from sklearn import cluster
-from sklearn.cluster import DBSCAN
-from sklearn.preprocessing import StandardScaler
+import pandas as pd 
 import numpy as np
-from sklearn.datasets import make_moons
-import math
 import matplotlib.pyplot as plt
-from kneed import KneeLocator
+from sklearn.cluster import DBSCAN as  skDBSCAN
+from sklearn.datasets import make_moons, make_circles
+from sklearn.metrics.cluster import homogeneity_score
+from sklearn.metrics.cluster import rand_score
+from sklearn.metrics.cluster import completeness_score
+
+
+def dist(X,Y):
+	#euclidean distance
+	return np.sqrt(sum([(x-y)*(x-y) for x,y in zip(X,Y)]))
+class DBSCAN():
+	def __init__(self, eps=1, minSamples=10):
+		self.eps = eps
+		self.minSamples = minSamples
+
+	def expand(self, sample, neighbors):
+		"""
+		method  expands cluster until border of density
+		"""
+		cluster = set([sample])
+		for neighbor in neighbors:
+			if  not neighbor  in self.visited:
+				self.visited.append(neighbor)
+				self.neighbors[neighbor] = self.get_neigs(neighbor)
+				if len(self.neighbors[neighbor]) >= self.minSamples:
+					expanded_cluster = self.expand(neighbor, self.neighbors[neighbor])
+					cluster = cluster.union(expanded_cluster)
+				else:
+					cluster.add(neighbor)
+		return cluster
+
+	def get_neigs(self, sample):
+		"""
+		return array of neighbors of sample
+		including sample
+		it means all elements of X with distance less than eps
+		"""
+
+		neighbors = [i   for i,s in enumerate(self.X) if (dist(self.X[sample], s) <self.eps) ]
+		return np.array(neighbors)
+
+	def get_labels(self):
+		"""
+		assign label of 
+		each samples of each cluster
+		"""
+		labels = np.full(shape=self.X.shape[0], fill_value=len(self.clusters))
+		for i, cluster in self.clusters.items():
+			for sample in cluster:
+				labels[sample] = i
+		return labels
+
+	def predict(self, X):
+		"""
+		based a dataset returns labels to X
+		"""
+		self.X = X
+		self.clusters = {}
+		self.visited = []
+		self.neighbors = {}
+		n_samples = np.shape(self.X)[0]
+		for sample in range(n_samples):
+			if  not (sample in self.visited):
+				self.neighbors[sample] = self.get_neigs(sample)
+				self.visited.append(sample)
+				if len(self.neighbors[sample]) >= self.minSamples:
+					
+					new_cluster = self.expand(sample, self.neighbors[sample])
+					self.clusters[len(self.clusters)]=new_cluster
+				else:
+					if self.clusters.get(-1)==None:
+							self.clusters[-1]=set([sample])
+					else:
+							self.clusters[-1].add(sample)
+
+		cluster_labels = self.get_labels()
+		return cluster_labels
+
+
+
+####################################    DBSCANS     #################################### 
+
+
+##    Constansts     ##
+epsilon = 0.2
+min_points = 3
+
+#########    Make Moons DBSCAN     ######### 
+X_moons,y = make_moons(n_samples = 500, shuffle=False, noise=0.07)
+custom_dbscan_moons=DBSCAN(epsilon,min_points).predict(X_moons)
+sk_dbscan_moons = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_moons)
+
+#########    Make Circles DBSCAN     ######### 
+X_circles,y = make_circles(n_samples = 500, shuffle=False, noise=0.02, factor = 0.5)
+custom_dbscan_circles=DBSCAN(epsilon,min_points).predict(X_circles)
+sk_dbscan_circles = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_circles)
+
+#########    User Data DBSCAN     ######### 
+epsilon = 15
+min_points = 8
+filepath = "User_Data.csv"
+X_user_data = np.array(pd.read_csv(filepath))
+custom_dbscan_user_data=DBSCAN(epsilon,min_points).predict(X_user_data)
+sk_dbscan_user_data = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_user_data)
 
-"""
 
-# remove male female from dataset
 
 
-Looking to fix dbscan 
 
-get new datasets
+####################################    Graphing     #################################### 
 
+plt.figure(figsize = [8, 12], dpi =80)
 
+# Graphing Moons #
+plt.subplot(321)
+plt.scatter(x= X_moons[:,0], y= X_moons[:,1], c = custom_dbscan_moons)
+plt.title('Custom DBSCAN Moon')
 
-name = main
+plt.subplot(322)
+plt.title('Sklearn DBSCAN Moon')
+plt.scatter(x= X_moons[:,0], y= X_moons[:,1], c = sk_dbscan_moons.labels_)
 
+# Graphing Circles #
+plt.subplot(323)
+plt.scatter(x= X_circles[:,0], y= X_circles[:,1], c = custom_dbscan_circles)
+plt.title('Custom DBSCAN Circles')
+plt.subplot(324)
+plt.title('Sklearn DBSCAN Circles')
+plt.scatter(x= X_circles[:,0], y= X_circles[:,1], c = sk_dbscan_circles.labels_)
 
-"""
+# Graphing User Data #
+plt.subplot(325)
+plt.scatter(X_user_data[:,0], X_user_data[:,1],X_user_data[:,2],  c = custom_dbscan_user_data)
+plt.title('Custom DBSCAN User Data')
+plt.subplot(326)
+plt.title('Sklearn DBSCAN User Data')
+plt.scatter(X_user_data[:,0], X_user_data[:,1],X_user_data[:,2], c = sk_dbscan_user_data.labels_)
 
+####################################    Printing Accuracy     #################################### 
 
 
+print("moons dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("rand score:         ", rand_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("completeness score: ", completeness_score(sk_dbscan_moons.labels_,custom_dbscan_moons))
+print("\n")
 
-# file_path = "User_Data.csv"
+print("circles dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("rand score:         ", rand_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("completeness score: ", completeness_score(sk_dbscan_circles.labels_,custom_dbscan_circles))
+print("\n")
 
+print("userdata dataset")
+print("homogeneity score:  ", homogeneity_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
+print("rand score:         ", rand_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
+print("completeness score: ", completeness_score(sk_dbscan_user_data.labels_,custom_dbscan_user_data))
 
-
-# dataset = np.array(pd.read_csv(file_path))
-dataset, not_used =  make_moons(
-    n_samples= 700, noise=0.08
-)
-
-
-# print(dataset)
-# print(not_used)
-
-# dataset = "Use_Data.csv"
-
-# for i in not_used:
-#     print(i)
-
-
-
-
-# print(len(not_used))
-
-
-new = []
-for i in range(10):
-
-    new.append(1)
-
-# print(len(new))
-x = dataset
-
-count = 0
-
-# for i in x:
-#     if i[0]>1:
-#         x[i] == [1]
-#     else:
-#         x[i] == [0]
-        
-        
-
-labeling = list([1]*len(dataset))
-
-# array_df = np.array(df)
-
-dict_ds = {}
-count = 1
-
-for i in dataset: #makes dictionary { CustomerID : [numpy array of variables to eb used for dbscan]}
-    dict_ds[count] =  i
-    count+=1
-
-
-# print(len(dataset))
-# print(dataset)
-
-# for i in dict_ds:
-#     print(i, dict_ds[i])
-
-cluster_label = np.shape(len(dict_ds[1]))
-
-# print(cluster_label)
-
-
-
-"""
-loops through everyone and if there is someone matchign the minimum distance combines them in
-"""
-
-
-
-def euclidean_distance( point1, point2):
-    """
-    calcualates euclidean distance of 2 points. 
-    expectation is in form point1 = (x,y)
-    """
-
-    sums = 0
-    for x1,x2 in zip(point1, point2):
-        sums+= ((x1-x2)**2)
-
-    return math.sqrt(sums)
-
-
-
-def already_clustered(clusters, point):
-
-    """
-    True if point is in the list
-    False if the point is not in the list
-
-
-    [ [1,2,4] ]
-    """
-
-    for thelist in clusters:
-        if point in thelist:
-            return True
-    return False
-
-
-def noise(dataset,clusters):
-    """
-    """
-
-    noise = []
-    unpacked_clusters = []
-    # for the_list in clusters:
-    #     for i in the_list:
-            
-                
-    for i in clusters:
-        for j in i:
-            unpacked_clusters.append(j)
-            
-            
-    for i in dataset:
-        for j in dataset[i]:
-            if j not in unpacked_clusters:
-                noise.append(j)
-        
-
-
-def findEpsilon(dataset, minPts):
-    kNearestDist = []
-    #List of Lists, whose index corresponds to the point in the dataset. ie: index 2 is the list of distances from all points to point 2
-    distances = []
-
-    # print(dataset)
-    for p1 in dataset:
-        distP1 = []
-        for p2 in dataset:
-            distP1.append(euclidean_distance(dataset[p1], dataset[p2]))
-        distances.append(distP1)
-
-    for i in range(len(distances)):
-        sortedDist = sorted(distances[i])
-        kNearestDist.append(list(sortedDist)[minPts])
-    kNearestDist.sort()
-    plt.plot(kNearestDist)
-    plt.show()
-
-    maxCurve = []
-    for i in range(1, len(kNearestDist)-1):
-        secDerivative = kNearestDist[i+1] + kNearestDist[i-1] - 2 * kNearestDist[i]
-        maxCurve.append(secDerivative)
-    maxValue = max(maxCurve)
-    maxIndex = maxCurve.index(maxValue) + 1
-    epsilon = kNearestDist[maxIndex]
-
-    kn = KneeLocator(range(0, 200), kNearestDist, curve='convex', direction='increasing', interp_method='interp1d')
-    epsilon2 = kNearestDist[kn.knee]
-
-    print(epsilon)
-    print(epsilon2)
-
-    return epsilon2
-
-
-
-def dbscan(dataset,epsilon, min_points):
-    """
-    
-    dataset is dict {key: [np array of variables used for dataset]}
-
-    """
-
-
-    clusters  = [] #list of lists of all the clusters
-
-
-
-    for i in dataset: #main point
-        i_list = []
-
-
-        for j in dataset: #secondary point
-            # if i != j:
-                distance = euclidean_distance(dataset[i],dataset[j])#distance  between the two
-                within_bounds = distance >= epsilon #boolean
-
-                if within_bounds: #if it meets epsilon criteria  
-
-                    if not already_clustered(clusters, j):
-                        i_list.append(j) #it is already not part of a group   
-                        print(i_list)               
-        if len(i_list) >= min_points:  #if it meets min points criteria
-                clusters.append(i_list)
-
-    label = [-1]*(len(dataset))
-    count = 0
-    for i in clusters:
-        for j in i: 
-            label[j-1] = count
-        count +=1
-
-
-
-
-
-    return len(clusters), noise(dataset,clusters), clusters,label
-
-# print(3)
-
-
-            # if not i_list: #if the list is not empty
-            
-            #     for list in i_list:
-                
-
-            # if euclidean_distance(dataset[i],dataset[j]) <= epsilon and :
-                
-    
-
-
-min_clusters = 10 # epsilon = findEpsilon(dict_ds,min_clusters)
-epsilon = .5
-
-output = dbscan(dict_ds,epsilon,min_clusters)
-
-new = output[3]
-    
-print("Number of Clusters:", output[0], )
-# print(output[3])
-
-# print(dataset[:,0],output[2])
-
-# for i in output[2]:
-#     print(i)
-
-plt.scatter(x= dataset[:,0], y= dataset[:,1], c = new)
 
 plt.show()
 
 
 
 
+####################################    Adding your own Dataset     #################################### 
 
 
+def dbscan_my_dataset():
+
+	print("Do you want to show dbscan your own dataset. yes or no? ")
+
+	x = input("My answer: ")
+	
+	if x == "yes":
+		
+
+		print("We will ask for your filepath, please ensure all columns are numbers")
+		filepath = input("filepath: ")
+
+		epsilon = int(input("epsilon: "))
+		min_points = int(input("minimum # of points for a cluster: "))
+		print("we will graph you dataset in a 2d graph, for higher dimensions please edit the code in the graphing")
+
+		### Performing DBSCAN (no need to edit) ###
+		X_input = np.array(pd.read_csv(filepath))
+		custom_dbscan_input = DBSCAN(epsilon,min_points).predict(X_user_data)
+		sk_dbscan_input = skDBSCAN(eps=epsilon, min_samples=min_points).fit(X_user_data)
 
 
+		### Graphing DBSCANs (no need to edit if your graph is 2d) ###
+
+		#to graph, you must edit the number of dimensions you want to see, we have by default a 2d graph
+		plt.subplot(121)
+		plt.scatter(X_input[:,0], X_input[:,1], c = custom_dbscan_input)
+		plt.title('Custom DBSCAN Input')
+		plt.subplot(122)
+		plt.title('Sklearn DBSCAN Input')
+		plt.scatter(X_input[:,0], X_input[:,1], c = sk_dbscan_input.labels_)
 
 
+		### Printing closeness custom DBSCAN to sklearn DBSCAN (no need to edit if your graph is 2d) ###
+
+		print("input dataset")
+		print("homogeneity score:  ", homogeneity_score(sk_dbscan_input.labels_,custom_dbscan_input))
+		print("rand score:         ", rand_score(sk_dbscan_input.labels_,custom_dbscan_input))
+		print("completeness score: ", completeness_score(sk_dbscan_input.labels_,custom_dbscan_input))
 
 
+		#showing graph
+		plt.show()
 
-
-
-
-
-
-
+dbscan_my_dataset()
